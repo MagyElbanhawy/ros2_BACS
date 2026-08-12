@@ -31,6 +31,7 @@ scripts/             reproduce.py (S1-S6) + generate_paper_results.py (BACS+ add
 tests/               smoke + reproducibility tests
 paper_results/       frozen CSVs backing the manuscript tables
 ros2_ws/             reference ROS 2 scheduler node (bacs_scheduler) for deployment
+third_party/          external ROS references used for integration (Multi_Robots_ros2, limo_ros2)
 hardware/            LoRa parameters + physical-experiment protocol
 paper/               manuscripts: BACS_full_paper.docx (original) + BACS_revised_manuscript.{md,docx}
 paper_figures/       generated manuscript figures (scripts/make_figures.py)

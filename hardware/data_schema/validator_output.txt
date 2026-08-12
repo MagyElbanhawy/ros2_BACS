@@ -1,0 +1,3 @@
+RAW-VERIFIED:
+Original session manifests and metrics are present.
+Raw records aggregate consistently with reported_hardware_summary.csv.
