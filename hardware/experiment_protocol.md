@@ -8,28 +8,22 @@ reported RMSE summary.
 
 ## 1. Platform
 
-- 2–5 differential-drive robots operating under the ROS logging stack and
-  local-mapping pipeline used by the EMRMF workflow.
-- One SX1276 LoRa radio per robot, configured per the hardware radio settings
-  used in the trial, with a station-side radio hub and duty-cycle enforcement.
-- A fixed ground-truth reference based on Leica MS60 total-station measurements
-  and surveyed fiducials, recorded at a minimum of 10 Hz.
-- A workstation acting as the fusion server with the g2o/GTSAM back-end.
+- 2–5 differential-drive robots (physically validated on 2 modified AgileX LIMO platforms carrying EAI T-mini Pro 2D LiDARs, Orbbec DaBai RGB-D cameras, Intel NUC i7 onboard computers, and ROS 2 Humble) operating under the ROS 2 logging stack and local-mapping pipeline.
+- One RYLR998 / SX1276 LoRa radio per robot operating at 868 MHz, configured per the hardware radio settings used in the trial (SF7, 125 kHz BW, 4/5 CR, +20 dBm / 14 dBm ERP), with a station-side radio hub and 1% duty-cycle enforcement.
+- Fixed ground-truth reference based on Vicon motion capture / Leica MS60 total-station measurements and surveyed fiducials, recorded at 10 Hz or better.
+- Workstation acting as the central fusion server with the trust-weighted pose-graph back-end.
 
 ## 2. Environment
 
-- Test area at New Mansoura University with overlapping robot territories and
-  repeatable, fixed waypoint coverage for each session.
-- Ground-truth reference: Leica MS60 total station plus surveyed AprilTag
-  markers; all ground-truth poses were logged together with the ROS telemetry.
+- Indoor laboratory test area at New Mansoura University (~150 m²) with overlapping robot territories and repeatable, fixed waypoint coverage for each session.
+- Ground-truth reference: Vicon motion capture / Leica MS60 total station plus surveyed AprilTag markers; all ground-truth poses were logged together with ROS 2 telemetry.
 
 ## 3. Fixed factors
 
-- Trajectory plan and start poses held constant across the FIFO, BACS, and BACS+
-  policy arms for each team size.
-- Radio configuration: SX1276 at +20 dBm, SF7/BW125, 1% duty cycle ceiling.
+- Trajectory plan and start poses held constant across the FIFO, BACS, and BACS+ policy arms for each trial.
+- Radio configuration: RYLR998 / SX1276 at 868 MHz, SF7/BW125, 1% duty cycle ceiling ($W = 60\text{ s}$).
 - Session length: 12 minutes with a 60 s duty-cycle window.
-- Deferral coefficient rule: `deferral_derived` (γ = ln2 / T_defer).
+- Deferral coefficient rule: `deferral_derived` ($\gamma = \ln 2 / T_{\text{defer}} \approx 0.0045\text{ s}^{-1}$).
 
 ## 4. Arms and validation data
 

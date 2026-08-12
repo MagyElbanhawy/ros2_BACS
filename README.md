@@ -124,10 +124,11 @@ python scripts/generate_paper_results.py   # progression, S7, S8, S9
 
 ## Deployment (ROS 2)
 
-`ros2_ws/src/bacs_scheduler` is a reference ROS 2 node that runs the **same**
-decision functions on a real EMRMF pipeline (candidates in → selected
-constraints out, one selection per duty-cycle window). It is a build-ready
-scaffold, not yet run on hardware; see its README and `hardware/` for the LoRa
+`ros2_ws/src/bacs_scheduler` is the ROS 2 node running the **same**
+decision functions on the EMRMF pipeline (candidates in → selected
+constraints out, one selection per duty-cycle window). Validated on physical
+hardware (two modified LIMO differential-drive robots under Vicon ground truth at
+New Mansoura University); see its README and `hardware/` for the LoRa
 parameters and physical-experiment protocol.
 
 ## Key findings
