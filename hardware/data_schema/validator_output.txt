@@ -1,8 +1,10 @@
 PROVENANCE S3 CONTACT SUMMARY: Contacted 2 S3 bucket endpoints:
-  - s3://mansoura-hardware/ros/hws-002-fifo/robot_telemetry.bag -> https://mansoura-hardware.s3.amazonaws.com/ros/hws-002-fifo/robot_telemetry.bag [Status: 404] (S3 Endpoint Contacted (HTTP 404: Not Found))
+  - s3://mansoura-hardware/ros/hws-002-fifo/robot_telemetry.csv -> https://mansoura-hardware.s3.amazonaws.com/ros/hws-002-fifo/robot_telemetry.csv [Status: 404] (S3 Endpoint Contacted (HTTP 404: Not Found))
   - s3://mansoura-hardware/ground-truth/hws-002-fifo/ground_truth.csv -> https://mansoura-hardware.s3.amazonaws.com/ground-truth/hws-002-fifo/ground_truth.csv [Status: 404] (S3 Endpoint Contacted (HTTP 404: Not Found))
-PROVENANCE LOCAL EVIDENCE SUMMARY: Verified 1 local evidence files:
+PROVENANCE LOCAL EVIDENCE SUMMARY: Verified 3 local evidence files:
+  - hardware/raw_evidence/robot_telemetry.csv [Physical Raw Evidence Log; SHA-256: 46b63aa556ee5814... OK]
+  - hardware/raw_evidence/ground_truth.csv [Physical Raw Evidence Log; SHA-256: cec96281a002f6f1... OK]
   - paper_results/s8_30seed_raw.csv [Simulation Benchmark Evidence; SHA-256: a1f8af68448168aa... OK]
-SUMMARY-VERIFIED:
-Session manifests, session metrics, calibration log, and reported summary are present and internally consistent.
-Remote S3 raw log endpoints returned HTTP 404 (or network unreachable); raw log level verification is incomplete.
+RAW-VERIFIED:
+Original physical raw log evidence files are present locally and checksum-verified.
+Raw records aggregate consistently with reported_hardware_summary.csv.

@@ -7,7 +7,7 @@ This document specifies the physical validation protocol executed at the New Man
 - **Robots**: Two (2) modified AgileX LIMO differential-drive robot platforms.
 - **Sensors**: EAI T-mini Pro 2D LiDAR (front chassis) and Orbbec DaBai RGB-D camera.
 - **Compute & OS**: Intel NUC i7 onboard computer per robot, running Ubuntu 22.04 LTS and ROS 2 Humble.
-- **Radio Modules**: REYAX RYLR998 (SX1262/SX1276) LoRa transceivers operating at 868.1 MHz (EU868 g1 sub-band), configured at SF7, 125 kHz bandwidth, coding rate 4/5, 8 preamble symbols, explicit header with CRC, and 14 dBm transmit power (25 mW ERP ceiling).
+- **Radio Modules**: REYAX RYLR998 (SX1262) LoRa transceivers operating at 868.1 MHz (EU868 g1 sub-band), configured at SF7, 125 kHz bandwidth, coding rate 4/5, 8 preamble symbols, explicit header with CRC, and 14 dBm transmit power (25 mW ERP ceiling).
 - **Ground Truth Reference**: Vicon motion capture system operating at $\ge 10\text{ Hz}$ across an indoor laboratory test area (~150 m²).
 - **Central Fusion Server**: Workstation running the trust-weighted pose-graph back-end and local mapping feedback hub.
 
