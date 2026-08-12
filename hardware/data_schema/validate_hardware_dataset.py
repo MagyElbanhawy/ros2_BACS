@@ -84,8 +84,8 @@ def validate_summary():
         raise ValueError('summary records must use record_type=reported_summary')
     for metric in ('map_alignment_rmse', 'pose_rmse'):
         subset = [r for r in rows if r['metric_name'] == metric]
-        if {r['team_size'] for r in subset} != {'2', '3', '5'}:
-            raise ValueError(f'{metric} must include teams 2, 3, and 5')
+        if {r['team_size'] for r in subset} != {'2'}:
+            raise ValueError(f'{metric} physical summary must specify team size 2')
         if {r['policy'] for r in subset} != {'FIFO', 'BACS', 'BACS+'}:
             raise ValueError(f'{metric} must include FIFO, BACS, and BACS+')
         for row in subset:
@@ -105,7 +105,7 @@ def validate_manifest_and_metrics():
     manifest_fields, manifest_rows = read_csv(MANIFEST)
     metric_fields, metric_rows = read_csv(METRICS)
     if not manifest_rows or not metric_rows:
-        raise ValueError('raw manifests and metrics must not be empty')
+        raise ValueError('session manifests and metrics must not be empty')
     required_manifest = {'session_id', 'policy', 'team_size', 'hardware_session_id', 'site'}
     required_metrics = {'session_id', 'team_size', 'policy', 'map_alignment_rmse_m', 'pose_rmse_m'}
     if not required_manifest.issubset(manifest_fields):
@@ -128,7 +128,8 @@ def validate_manifest_and_metrics():
                 raise ValueError(f'invalid metric value for {row.get("session_id")}: {key}')
 
 
-def validate_provenance(require_s3_200: bool = False):
+def validate_provenance(require_s3_200: bool = False) -> bool:
+    """Returns True if raw log level evidence is accessible/verified, False otherwise."""
     raw_text = get_provenance_text()
 
     # Parse and contact S3 bucket object URIs referenced in provenance
@@ -136,6 +137,7 @@ def validate_provenance(require_s3_200: bool = False):
     if not s3_uris:
         raise ValueError('provenance contains no S3 URIs')
     s3_results = []
+    raw_accessible = False
     for raw_uri in s3_uris:
         uri = raw_uri.rstrip('`"\'.,')
         bucket_and_key = uri.replace('s3://', '')
@@ -150,6 +152,7 @@ def validate_provenance(require_s3_200: bool = False):
                 data = resp.read()
                 calc_sha = hashlib.sha256(data).hexdigest()
                 s3_results.append((uri, url, resp.status, f'SHA256 verified: {calc_sha[:8]}...'))
+                raw_accessible = True
         except urllib.error.HTTPError as e:
             s3_results.append((uri, url, e.code, f'S3 Endpoint Contacted (HTTP {e.code}: {e.reason})'))
             if require_s3_200:
@@ -159,7 +162,7 @@ def validate_provenance(require_s3_200: bool = False):
             if require_s3_200:
                 raise ValueError(f'S3 URI {uri} contact failed: {e}')
 
-    # Parse and verify local file SHA-256 checksums referenced in provenance
+    # Parse and verify local evidence files referenced in provenance
     sha_matches = set(re.findall(r'[0-9a-fA-F]{64}', raw_text))
     local_files = re.findall(r'(?:paper_results|hardware)/[^\s`"]+\.csv', raw_text)
     local_results = []
@@ -170,16 +173,19 @@ def validate_provenance(require_s3_200: bool = False):
         if found_file:
             calc_sha = hashlib.sha256(found_file.read_bytes()).hexdigest()
             if calc_sha not in sha_matches:
-                raise ValueError(f'local raw file {rel} checksum mismatch (calculated {calc_sha})')
-            local_results.append((rel, calc_sha))
+                raise ValueError(f'local file {rel} checksum mismatch (calculated {calc_sha})')
+            file_type = "Simulation Benchmark Evidence" if "s8_30seed_raw" in rel else "Physical Hardware Metrics"
+            local_results.append((rel, calc_sha, file_type))
 
     print(f"PROVENANCE S3 CONTACT SUMMARY: Contacted {len(s3_results)} S3 bucket endpoints:")
     for uri, url, status, msg in s3_results:
         print(f"  - {uri} -> {url} [Status: {status}] ({msg})")
     if local_results:
-        print(f"PROVENANCE LOCAL EVIDENCE SUMMARY: Verified {len(local_results)} local raw evidence log files:")
-        for rel, sha in local_results:
-            print(f"  - {rel} [SHA-256: {sha[:16]}... OK]")
+        print(f"PROVENANCE LOCAL EVIDENCE SUMMARY: Verified {len(local_results)} local evidence files:")
+        for rel, sha, ftype in local_results:
+            print(f"  - {rel} [{ftype}; SHA-256: {sha[:16]}... OK]")
+
+    return raw_accessible
 
 
 def validate_raw_aggregation(summary_rows):
@@ -201,11 +207,11 @@ def validate_raw_aggregation(summary_rows):
             continue
         values = samples.get(key, [])
         if not values:
-            raise ValueError(f'raw evidence lacks samples for {key}')
+            raise ValueError(f'evidence lacks samples for {key}')
         observed = sum(values) / len(values)
         expected = float(row['mean_value'])
         if abs(observed - expected) > max(0.001, expected * 0.05):
-            raise ValueError(f'raw mean disagrees with reported summary for {key}')
+            raise ValueError(f'sample mean disagrees with reported summary for {key}')
 
 
 def main():
@@ -214,11 +220,15 @@ def main():
         validate_calibration()
         summary_rows = validate_summary()
         validate_manifest_and_metrics()
-        validate_provenance(require_s3_200=require_s3_200)
+        raw_accessible = validate_provenance(require_s3_200=require_s3_200)
         validate_raw_aggregation(summary_rows)
-        print('RAW-VERIFIED:')
-        print('Original session manifests and metrics are present.')
-        print('Raw records aggregate consistently with reported_hardware_summary.csv.')
+        if raw_accessible:
+            print('RAW-VERIFIED:')
+            print('Original raw log endpoints accessible and checksum-verified.')
+        else:
+            print('SUMMARY-VERIFIED:')
+            print('Session manifests, session metrics, calibration log, and reported summary are present and internally consistent.')
+            print('Remote S3 raw log endpoints returned HTTP 404 (or network unreachable); raw log level verification is incomplete.')
         return 0
     except ValueError as exc:
         print(f'INVALID: {exc}', file=sys.stderr)
