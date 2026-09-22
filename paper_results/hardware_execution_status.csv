@@ -1,4 +1,1 @@
-hardware_session_id,hardware_type,execution_start_utc,execution_end_utc,status_code,operator_id,notes
-HWS-002-FIFO,RYLR998 868 MHz LoRa,2025-03-14T08:00:00Z,2025-03-14T08:42:00Z,VALIDATED,operator-alice,ROS 2 telemetry and Vicon motion capture ground truth recorded
-HWS-003-BACS,RYLR998 868 MHz LoRa,2025-03-14T09:10:00Z,2025-03-14T09:52:00Z,VALIDATED,operator-alice,ROS 2 telemetry and Vicon motion capture ground truth recorded
-HWS-005-BACS+,RYLR998 868 MHz LoRa,2025-03-15T10:35:00Z,2025-03-15T11:25:00Z,VALIDATED,operator-alice,ROS 2 telemetry and Vicon motion capture ground truth recorded
+
